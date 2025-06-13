@@ -5,10 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trip Itinerary</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://kit.fontawesome.com/4b9b2b9b2b.js" crossorigin="anonymous"></script>
   <style>
     body {
       font-family: 'Arial', sans-serif;
+      background-color: #f3f4f6;
+    }
+    .tile {
+      width: 45%;
+      height: 200px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .tile:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    @media (hover: none) {
+      .tile:hover {
+        transform: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+    }
+    .iphone-view {
+      max-width: 375px;
+      margin: 0 auto;
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .iphone-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .modal {
       display: none;
@@ -28,13 +67,6 @@
       width: 90%;
       max-width: 600px;
     }
-    .iphone-view {
-      max-width: 375px;
-      margin: 0 auto;
-      border: 2px solid #e5e7eb;
-      border-radius: 16px;
-      overflow: hidden;
-    }
     @media (max-width: 640px) {
       .web-view {
         display: none;
@@ -43,24 +75,25 @@
     .highlight {
       color: #3b82f6; /* Blue for emphasis */
     }
-    .status-complete { color: #10b981; }
+    .status-booked { color: #10b981; }
     .status-pending { color: #f59e0b; }
-    .status-booked { color: #8b5cf6; }
+    .svg-icon {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-  <!-- Device Selection Modal -->
-  <div id="deviceModal" class="modal flex items-center justify-center">
-    <div class="modal-content bg-white rounded-lg shadow-lg p-6 text-center">
-      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Choose Your View</h2>
-      <div class="flex justify-center space-x-4">
-        <button onclick="selectView('iphone')" class="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg transition">
-          <i class="fas fa-mobile text-blue-500 mr-2"></i> iPhone
-        </button>
-        <button onclick="selectView('web')" class="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg transition">
-          <i class="fas fa-computer text-purple-500 mr-2"></i> Web
-        </button>
-      </div>
+<body class="min-h-screen flex items-center justify-center">
+  <!-- View Selection Tiles -->
+  <div class="flex justify-center space-x-4 mb-6" id="viewSelection">
+    <div class="tile" onclick="selectView('iphone')">
+      <svg class="svg-icon" fill="blue" viewBox="0 0 24 24"><path d="M19 1H9c-1.1 0-2 .9-2 2v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-2V3c0-.6-.4-1-1-1zm-1 18H6c-.6 0-1-.4-1-1V7h14v11c0 .6-.4 1-1 1zm-2-8c0 .6-.4 1-1 1H8c-.6 0-1-.4-1-1v-2c0-.6.4-1 1-1h7c.6 0 1 .4 1 1v2z"/></svg>
+      <h3 class="text-lg font-semibold text-gray-800">View on iPhone</h3>
+    </div>
+    <div class="tile" onclick="selectView('web')">
+      <svg class="svg-icon" fill="purple" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 18H5c-.6 0-1-.4-1-1V5c0-.6.4-1 1-1h14c.6 0 1 .4 1 1v14c0 .6-.4 1-1 1zm-2-8H7v-2h10v2z"/></svg>
+      <h3 class="text-lg font-semibold text-gray-800">View on Web</h3>
     </div>
   </div>
 
@@ -71,19 +104,21 @@
       <div id="itineraryListIphone"></div>
     </div>
   </div>
-  <div id="webView" class="web-view p-6">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Trip Itinerary</h1>
-    <div id="itineraryListWeb" class="space-y-6"></div>
+  <div id="webView" class="web-view hidden">
+    <div class="p-6">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Trip Itinerary</h1>
+      <div id="itineraryListWeb" class="space-y-6"></div>
+    </div>
   </div>
 
   <!-- Edit Modal -->
   <div id="editModal" class="modal flex items-center justify-center">
     <div class="modal-content bg-white rounded-lg shadow-lg p-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">Update Itinerary</h2>
+      <h2 class="text-xl font-semibold text-gray-800 mb-4"></h2>
       <form id="editForm" class="space-y-4">
         <div>
           <label class="block text-gray-600 font-medium text-sm">Section</label>
-          <input id="editSection" type="text" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" placeholder="e.g., Casa de Koko (3 Nights)">
+          <input id="editSection" type="text" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" placeholder="e.g., Tuscany (7 Nights)">
         </div>
         <div>
           <label class="block text-gray-600 font-medium text-sm">Type</label>
@@ -96,15 +131,15 @@
         </div>
         <div>
           <label class="block text-gray-600 font-medium text-sm">Date</label>
-          <input id="editDate" type="text" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" placeholder="e.g., Jun 14 - Jun 15, 2025">
+          <input id="editDate" type="text" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" placeholder="e.g., Jun 19 - Jun 20, 2025">
         </div>
         <div>
           <label class="block text-gray-600 font-medium text-sm">Details</label>
-          <textarea id="editDetails" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" rows="3" placeholder="e.g., SFO to TPA, United, Cost: $2426.92"></textarea>
+          <textarea id="editDetails" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" rows="3" placeholder="e.g., TPA to FLR, Delta/KLM, Cost: $2900"></textarea>
         </div>
         <div>
           <label class="block text-gray-600 font-medium text-sm">Status</label>
-          <input id="editStatus" type="text" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" placeholder="e.g., Complete">
+          <input id="editStatus" type="text" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" placeholder="e.g., Booked">
         </div>
         <div>
           <label class="block text-gray-600 font-medium text-sm">Link (optional)</label>
@@ -124,44 +159,44 @@
       {
         section: "Casa de Koko (3 Nights)",
         items: [
-          { type: "Flight", date: "Jun 14 - Jun 15, 2025", details: "SFO to TPA, United, Cost: $2426.92", status: "Complete", link: "" },
-          { type: "Car Rental", date: "Jun 15 - Jun 19, 2025", details: "Enterprise, Cost: $404.33", status: "Complete", link: "" }
+          { type: "Flight", date: "Jun 14 - Jun 15, 2025", details: "SFO to TPA, United, Cost: $2426.92", status: "Booked", link: "" },
+          { type: "Car Rental", date: "Jun 15 - Jun 19, 2025", details: "Enterprise, Cost: $404.33", status: "Booked", link: "" }
         ]
       },
       {
         section: "Tuscany (7 Nights)",
         items: [
-          { type: "Flight", date: "Jun 19 - Jun 20, 2025", details: "TPA to FLR, Delta/KLM, Cost: $2900", status: "Complete", link: "" },
-          { type: "Accommodation", date: "Jun 20 - Jun 21, 2025", details: "La Dimora del Mercante, Cost: $371", status: "Complete", link: "https://mimasuites.com/en/la-dimora-del-mercante/" },
-          { type: "Accommodation", date: "Jun 21 - Jun 28, 2025", details: "Il Cortile Pratolino, Cost: $2442", status: "Complete", link: "https://www.tuscanynowandmore.com/villas/il-cortile-pratolino" },
+          { type: "Flight", date: "Jun 19 - Jun 20, 2025", details: "TPA to FLR, Delta/KLM, Cost: $2900", status: "Booked", link: "" },
+          { type: "Accommodation", date: "Jun 20 - Jun 21, 2025", details: "La Dimora del Mercante, Cost: $371", status: "Booked", link: "https://mimasuites.com/en/la-dimora-del-mercante/" },
+          { type: "Accommodation", date: "Jun 21 - Jun 28, 2025", details: "Il Cortile Pratolino, Cost: $2442", status: "Booked", link: "https://www.tuscanynowandmore.com/villas/il-cortile-pratolino" },
           { type: "Car Rental", date: "Jun 21 - Jun 28, 2025", details: "Sixt, BMW X1 or Similar, Cost: $1000 (Pay at Counter)", status: "Pending", link: "" }
         ]
       },
       {
         section: "Split, Croatia (4 Nights)",
         items: [
-          { type: "Flight", date: "Jun 28, 2025", details: "FLR to SPU, Lufthansa, Cost: $197.9", status: "Complete", link: "" },
-          { type: "Accommodation", date: "Jun 28 - Jun 30, 2025", details: "Procurator 7 Luxury Rooms, Cost: $578.95", status: "Complete", link: "https://procurator-7-luxury-rooms.splithotels.net/en/" },
+          { type: "Flight", date: "Jun 28, 2025", details: "FLR to SPU, Lufthansa, Cost: $197.9", status: "Booked", link: "" },
+          { type: "Accommodation", date: "Jun 28 - Jun 30, 2025", details: "Procurator 7 Luxury Rooms, Cost: $578.95", status: "Booked", link: "https://procurator-7-luxury-rooms.splithotels.net/en/" },
           { type: "Restaurant", date: "Jun 29, 2025", details: "Bokeria Kitchen & Wine, Cost: $200 (Pay at Restaurant)", status: "Booked", link: "https://www.tripadvisor.com/Restaurant_Review-g295370-d6903354-Reviews-Bokeria_Kitchen_Wine-Split_Split_Dalmatia_County_Dalmatia.html" },
-          { type: "Accommodation", date: "Jun 30 - Jul 2, 2025", details: "Forkira Luxury Hvar, Cost: $806.63", status: "Complete", link: "https://forkira.com/" },
+          { type: "Accommodation", date: "Jun 30 - Jul 2, 2025", details: "Forkira Luxury Hvar, Cost: $806.63", status: "Booked", link: "https://forkira.com/" },
           { type: "Accommodation", date: "Jul 2 - Jul 3, 2025", details: "HOTEL, Cost: $200 (TBD)", status: "Pending", link: "" },
-          { type: "Flight", date: "Jul 3, 2025", details: "SPU to TPA, Delta, Cost: $0", status: "Complete", link: "" }
+          { type: "Flight", date: "Jul 3, 2025", details: "SPU to TPA, Delta, Cost: $0", status: "Booked", link: "" }
         ]
       },
       {
         section: "Casa de Koko (3 Nights)",
         items: [
-          { type: "Flight", date: "Jul 6, 2025", details: "TPA to SFO, United, Cost: TBD", status: "Complete", link: "" }
+          { type: "Flight", date: "Jul 6, 2025", details: "TPA to SFO, United, Cost: TBD", status: "Booked", link: "" }
         ]
       }
     ];
 
-    // Icon mapping
+    // Icon mapping with SVG
     const iconMap = {
-      "Flight": '<i class="fas fa-plane text-blue-500 mr-2"></i>',
-      "Accommodation": '<i class="fas fa-hotel text-green-500 mr-2"></i>',
-      "Restaurant": '<i class="fas fa-utensils text-purple-500 mr-2"></i>',
-      "Car Rental": '<i class="fas fa-car text-orange-500 mr-2"></i>'
+      "Flight": '<svg class="svg-icon" fill="blue" viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm6-5h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V6H9v2zM3 3v2h18V3H3z"/></svg>',
+      "Accommodation": '<svg class="svg-icon" fill="green" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
+      "Restaurant": '<svg class="svg-icon" fill="purple" viewBox="0 0 24 24"><path d="M11 9H13V2H11v7zm-4 9.16V19h2v-3c0-.55.45-1 1-1h4c.55 0 1 .45 1 1v3h2v-.84c1.16-.41 2-1.52 2-2.82V7.5c0-.28-.22-.5-.5-.5s-.5.22-.5.5V14c0 .55-.45 1-1 1s-1-.45-1-1V7H9v7c0 .55-.45 1-1 1s-1-.45-1-1V7.5c0-.28-.22-.5-.5-.5s-.5.22-.5.5v7.84c0 1.3.84 2.41 2 2.82z"/></svg>',
+      "Car Rental": '<svg class="svg-icon" fill="orange" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11C5.84 5 5.29 5.42 5.08 6.01l-2.55 9.28c-.17.62.11 1.27.71 1.59.43.23 1.29.71 2.76.71h12.5c1.47 0 2.33-.48 2.76-.71.6-.32.88-.97.71-1.59l-2.55-9.28zm-1.46 13.99H6.54c-.66 0-1.04-.46-.98-1.09l1.75-12.91c.03-.24.24-.42.49-.42h11c.25 0 .46.18.49.42l1.75 12.91c.06.63-.32 1.09-.98 1.09zM8 16c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm8 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>'
     };
 
     // Render itinerary
@@ -177,18 +212,19 @@
         iphoneSection.className = 'mb-6';
         iphoneSection.innerHTML = `<h2 class="text-xl font-semibold text-gray-800 mb-3">${section.section}</h2>`;
         section.items.forEach((item, itemIndex) => {
+          const displayDetails = item.details.replace(/, Cost:.*?(?=(,|$))/, ''); // Remove Cost from display
           const itemDiv = document.createElement('div');
-          itemDiv.className = `bg-gray-50 p-3 rounded-lg mb-2 shadow hover:bg-gray-100 cursor-pointer border-l-4 border-${item.type === 'Flight' ? 'blue' : item.type === 'Accommodation' ? 'green' : item.type === 'Restaurant' ? 'purple' : 'orange'}-500`;
+          itemDiv.className = 'iphone-card';
           itemDiv.innerHTML = `
-            <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center justify-between mb-2">
               <div class="flex items-center">
                 ${iconMap[item.type]}
               </div>
-              <p class="text-sm status-${item.status.toLowerCase()}">${item.status}</p>
+              <span class="text-sm status-${item.status.toLowerCase()}">${item.status}</span>
             </div>
-            <p class="text-gray-800 font-medium highlight text-sm">${item.date}</p>
-            <p class="text-gray-600 text-sm">${item.details}</p>
-            ${item.link ? `<a href="${item.link}" target="_blank" class="text-blue-500 text-xs underline">View</a>` : ''}
+            <p class="text-gray-800 font-medium highlight text-sm mb-1">${item.date}</p>
+            <p class="text-gray-600 text-sm">${displayDetails}</p>
+            ${item.link ? `<a href="${item.link}" target="_blank" class="text-blue-500 text-xs underline mt-1 block">View</a>` : ''}
           `;
           itemDiv.onclick = () => openEditModal(sectionIndex, itemIndex);
           iphoneSection.appendChild(itemDiv);
@@ -230,13 +266,11 @@
 
     // Device selection
     function selectView(view) {
-      document.getElementById('deviceModal').style.display = 'none';
+      document.getElementById('viewSelection').style.display = 'none';
       if (view === 'iphone') {
         document.getElementById('iphoneView').classList.remove('hidden');
-        document.getElementById('webView').classList.add('hidden');
       } else {
         document.getElementById('webView').classList.remove('hidden');
-        document.getElementById('iphoneView').classList.add('hidden');
       }
       renderItinerary();
     }
@@ -276,8 +310,10 @@
       renderItinerary();
     });
 
-    // Initialize
-    document.getElementById('deviceModal').style.display = 'flex';
+    // Initialize with view selection tiles visible
+    document.getElementById('viewSelection').style.display = 'flex';
+    document.getElementById('iphoneView').classList.add('hidden');
+    document.getElementById('webView').classList.add('hidden');
   </script>
 </body>
 </html>
