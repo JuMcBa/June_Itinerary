@@ -85,35 +85,79 @@
         .clickable-row:hover {
             background-color: #f3f4f6;
         }
-        /* Dropdown and Sidebar Styles */
+        /* Dropdown Styles */
+        .dropdown-container {
+            position: relative;
+            display: none;
+            z-index: 50;
+        }
         .dropdown-menu {
             display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
+            position: fixed;
+            top: 80px; /* Adjust based on header height */
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            width: 90%;
+            max-width: 300px;
             background: white;
             border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 40;
-            transform: translateY(-10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
+            max-height: 70vh;
+            overflow-y: auto;
         }
         .dropdown-menu.active {
             display: block;
-            transform: translateY(0);
+            transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
-        .timeline-sidebar {
-            transition: transform 0.3s ease, opacity 0.3s ease;
+        .dropdown-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 49;
+        }
+        .dropdown-backdrop.active {
+            display: block;
+        }
+        /* Section Header Styles */
+        .section-header {
+            background: linear-gradient(to right, #e0f2fe, #f8fafc);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .toggle-btn:hover {
+            background: #1d4ed8;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        .chevron {
+            transition: transform 0.3s ease;
+        }
+        .chevron.rotate {
+            transform: rotate(180deg);
         }
         @media (max-width: 768px) {
+            .dropdown-container {
+                display: block;
+            }
             .timeline-sidebar {
                 display: none;
-            }
-            .dropdown-toggle {
-                display: flex;
             }
         }
         @media (min-width: 769px) {
@@ -121,7 +165,7 @@
                 transform: translateX(-100%);
                 opacity: 0;
             }
-            .dropdown-toggle {
+            .dropdown-container {
                 display: none;
             }
         }
@@ -130,49 +174,54 @@
 <body class="bg-gray-100 font-sans">
     <!-- Header -->
     <header class="bg-blue-600 text-white py-4 sticky top-0 z-50">
-        <div class="container mx-auto px-4 flex justify-between items-center">
-            <div>
+        <div class="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="text-center sm:text-left">
                 <h1 class="text-2xl sm:text-3xl font-bold">June 2025 Trip Itinerary</h1>
                 <p class="mt-1 text-sm sm:text-base">San Francisco to Tampa, Tuscany, Split, and Back</p>
             </div>
-            <button class="dropdown-toggle md:hidden bg-blue-700 text-white px-3 py-1 rounded-lg flex items-center gap-2" id="dropdown-toggle">
-                <span>Timeline</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </button>
-            <button class="dropdown-toggle hidden md:flex bg-blue-700 text-white px-3 py-1 rounded-lg" id="sidebar-toggle">Toggle Sidebar</button>
+            <div class="flex items-center gap-4">
+                <div class="dropdown-container">
+                    <button class="dropdown-toggle bg-blue-700 text-white px-3 py-1 rounded-lg flex items-center gap-2" id="dropdown-toggle">
+                        <span>Timeline</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
+                <button class="sidebar-toggle hidden md:flex bg-blue-700 text-white px-3 py-1 rounded-lg" id="sidebar-toggle">Hide Sidebar</button>
+            </div>
         </div>
         <!-- Dropdown Menu -->
-        <div class="dropdown-menu md:hidden" id="dropdown-menu">
+        <div class="dropdown-backdrop" id="dropdown-backdrop"></div>
+        <div class="dropdown-menu" id="dropdown-menu">
             <div class="p-4">
                 <h2 class="text-lg font-semibold mb-4">Trip Timeline</h2>
                 <div class="relative border-l-4 border-blue-500 pl-4">
                     <div class="timeline-item mb-4 cursor-pointer" data-section="summary">
                         <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium">Summary</p>
+                        <p class="font-medium text-sm sm:text-base">Summary</p>
                     </div>
                     <div class="timeline-item mb-4 cursor-pointer" data-section="sfo-tpa">
                         <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium">June 7: Depart SFO</p>
+                        <p class="font-medium text-sm sm:text-base">June 7: Depart SFO</p>
                     </div>
                     <div class="timeline-item mb-4 cursor-pointer" data-section="casa-de-koko-1">
                         <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium">June 8-12: Casa de Koko</p>
+                        <p class="font-medium text-sm sm:text-base">June 8-12: Casa de Koko</p>
                     </div>
                     <div class="timeline-item mb-4 cursor-pointer" data-section="tuscany">
                         <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium">June 14-21: Tuscany</p>
+                        <p class="font-medium text-sm sm:text-base">June 14-21: Tuscany</p>
                     </div>
                     <div class="timeline-item mb-4 cursor-pointer" data-section="split">
                         <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium">June 22-26: Split & Hvar</p>
+                        <p class="font-medium text-sm sm:text-base">June 22-26: Split & Hvar</p>
                     </div>
                     <div class="timeline-item mb-4 cursor-pointer" data-section="casa-de-koko-2">
                         <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium">June 27-29: Casa de Koko</p>
+                        <p class="font-medium text-sm sm:text-base">June 27-29: Casa de Koko</p>
                     </div>
                     <div class="timeline-item mb-4 cursor-pointer" data-section="tpa-sfo">
                         <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium">June 29: Return SFO</p>
+                        <p class="font-medium text-sm sm:text-base">June 29: Return SFO</p>
                     </div>
                 </div>
             </div>
@@ -220,10 +269,13 @@
         <main class="md:w-3/4">
             <!-- Summary Section -->
             <section id="summary" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
-                    Trip Summary
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="summary-content">Expand</button>
-                </h2>
+                <div class="section-header flex justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-bold">Trip Summary</h2>
+                    <button class="toggle-btn" data-target="summary-content">
+                        <span>Expand</span>
+                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
                 <div id="summary-content" class="section-content hidden">
                     <p><strong>Total Cost:</strong> $11,127.73</p>
                     <p><strong>Remaining Balance:</strong> $1,332.80</p>
@@ -233,10 +285,13 @@
 
             <!-- SFO to TPA -->
             <section id="sfo-tpa" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
-                    June 7: San Francisco to Tampa
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="sfo-tpa-content">Expand</button>
-                </h2>
+                <div class="section-header flex justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-bold">June 7: San Francisco to Tampa</h2>
+                    <button class="toggle-btn" data-target="sfo-tpa-content">
+                        <span>Expand</span>
+                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
                 <div id="sfo-tpa-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
@@ -270,10 +325,13 @@
 
             <!-- Casa de Koko (First Stay) -->
             <section id="casa-de-koko-1" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
-                    June 8-12: Casa de Koko, Tampa
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="casa-de-koko-1-content">Expand</button>
-                </h2>
+                <div class="section-header flex justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-bold">June 8-12: Casa de Koko, Tampa</h2>
+                    <button class="toggle-btn" data-target="casa-de-koko-1-content">
+                        <span>Expand</span>
+                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
                 <div id="casa-de-koko-1-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Accommodation Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
@@ -301,10 +359,13 @@
 
             <!-- Tuscany -->
             <section id="tuscany" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
-                    June 14-21: Tuscany, Italy
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="tuscany-content">Expand</button>
-                </h2>
+                <div class="section-header flex justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-bold">June 14-21: Tuscany, Italy</h2>
+                    <button class="toggle-btn" data-target="tuscany-content">
+                        <span>Expand</span>
+                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
                 <div id="tuscany-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
@@ -391,10 +452,13 @@
 
             <!-- Split & Hvar -->
             <section id="split" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
-                    June 22-26: Split & Hvar, Croatia
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="split-content">Expand</button>
-                </h2>
+                <div class="section-header flex justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-bold">June 22-26: Split & Hvar, Croatia</h2>
+                    <button class="toggle-btn" data-target="split-content">
+                        <span>Expand</span>
+                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
                 <div id="split-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
@@ -502,10 +566,13 @@
 
             <!-- Casa de Koko (Second Stay) -->
             <section id="casa-de-koko-2" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
-                    June 27-29: Casa de Koko, Tampa
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="casa-de-koko-2-content">Expand</button>
-                </h2>
+                <div class="section-header flex justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-bold">June 27-29: Casa de Koko, Tampa</h2>
+                    <button class="toggle-btn" data-target="casa-de-koko-2-content">
+                        <span>Expand</span>
+                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
                 <div id="casa-de-koko-2-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Accommodation Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
@@ -531,10 +598,13 @@
 
             <!-- TPA to SFO -->
             <section id="tpa-sfo" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
-                    June 29: Tampa to San Francisco
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="tpa-sfo-content">Expand</button>
-                </h2>
+                <div class="section-header flex justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-bold">June 29: Tampa to San Francisco</h2>
+                    <button class="toggle-btn" data-target="tpa-sfo-content">
+                        <span>Expand</span>
+                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
                 <div id="tpa-sfo-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
@@ -624,20 +694,24 @@
             button.addEventListener('click', () => {
                 const targetId = button.getAttribute('data-target');
                 const content = document.getElementById(targetId);
+                const chevron = button.querySelector('.chevron');
                 if (content.classList.contains('visible')) {
                     content.classList.remove('visible');
                     content.classList.add('hidden');
-                    button.textContent = 'Expand';
+                    button.querySelector('span').textContent = 'Expand';
+                    chevron.classList.remove('rotate');
                 } else {
                     // Collapse all other sections
                     document.querySelectorAll('.section-content').forEach(c => {
                         c.classList.remove('visible');
                         c.classList.add('hidden');
-                        c.parentElement.querySelector('.toggle-btn').textContent = 'Expand';
+                        c.parentElement.querySelector('.toggle-btn span').textContent = 'Expand';
+                        c.parentElement.querySelector('.chevron').classList.remove('rotate');
                     });
                     content.classList.remove('hidden');
                     content.classList.add('visible');
-                    button.textContent = 'Collapse';
+                    button.querySelector('span').textContent = 'Collapse';
+                    chevron.classList.add('rotate');
                 }
             });
         });
@@ -649,34 +723,46 @@
                 const section = document.getElementById(sectionId);
                 const content = section.querySelector('.section-content');
                 const toggleBtn = section.querySelector('.toggle-btn');
+                const chevron = toggleBtn.querySelector('.chevron');
 
                 // Collapse all other sections
                 document.querySelectorAll('.section-content').forEach(c => {
                     c.classList.remove('visible');
                     c.classList.add('hidden');
-                    c.parentElement.querySelector('.toggle-btn').textContent = 'Expand';
+                    c.parentElement.querySelector('.toggle-btn span').textContent = 'Expand';
+                    c.parentElement.querySelector('.chevron').classList.remove('rotate');
                 });
 
                 // Expand selected section
                 content.classList.remove('hidden');
                 content.classList.add('visible');
-                toggleBtn.textContent = 'Collapse';
+                toggleBtn.querySelector('span').textContent = 'Collapse';
+                chevron.classList.add('rotate');
 
                 section.scrollIntoView({ behavior: 'smooth' });
 
-                // Close dropdown on mobile
+                // Close dropdown
                 const dropdownMenu = document.getElementById('dropdown-menu');
-                if (dropdownMenu.classList.contains('active')) {
-                    dropdownMenu.classList.remove('active');
-                }
+                const dropdownBackdrop = document.getElementById('dropdown-backdrop');
+                dropdownMenu.classList.remove('active');
+                dropdownBackdrop.classList.remove('active');
             });
         });
 
         // Dropdown toggle
         const dropdownToggle = document.getElementById('dropdown-toggle');
         const dropdownMenu = document.getElementById('dropdown-menu');
+        const dropdownBackdrop = document.getElementById('dropdown-backdrop');
         dropdownToggle.addEventListener('click', () => {
+            const isActive = dropdownMenu.classList.contains('active');
             dropdownMenu.classList.toggle('active');
+            dropdownBackdrop.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking backdrop
+        dropdownBackdrop.addEventListener('click', () => {
+            dropdownMenu.classList.remove('active');
+            dropdownBackdrop.classList.remove('active');
         });
 
         // Sidebar toggle (desktop)
@@ -747,7 +833,6 @@
         // Row click handling
         document.querySelectorAll('.clickable-row').forEach(row => {
             row.addEventListener('click', (e) => {
-                // Prevent opening modal if clicking the hotel link
                 if (e.target.classList.contains('hotel-link')) {
                     e.stopPropagation();
                     return;
@@ -804,11 +889,12 @@
             });
         });
 
-        // Close modals with Escape key
+        // Close modals and dropdown with Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeAllModals();
                 dropdownMenu.classList.remove('active');
+                dropdownBackdrop.classList.remove('active');
             }
         });
     </script>
