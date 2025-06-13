@@ -1,900 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>June 2025 Trip Itinerary</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .timeline-item:hover .timeline-dot {
-            background-color: #3b82f6;
-        }
-        .section-content {
-            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
-        }
-        .section-content.hidden {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-        }
-        .section-content.visible {
-            max-height: 2000px;
-            opacity: 1;
-        }
-        td.paid-status {
-            background-color: #22c55e;
-            color: white;
-            font-weight: 500;
-        }
-        @media (max-width: 640px) {
-            table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-            thead {
-                position: sticky;
-                top: 0;
-                background: #e5e7eb;
-            }
-        }
-        body {
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            max-width: 90%;
-            max-height: 80%;
-            overflow-y: auto;
-        }
-        @media (min-width: 640px) {
-            .modal-content {
-                max-width: 500px;
-                padding: 2rem;
-            }
-        }
-        .hotel-link {
-            color: #3b82f6;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .hotel-link:hover {
-            color: #1d4ed8;
-            text-decoration: underline;
-        }
-        .clickable-row {
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .clickable-row:hover {
-            background-color: #f3f4f6;
-        }
-        /* Dropdown Styles */
-        .dropdown-container {
-            position: relative;
-            display: none;
-            z-index: 50;
-        }
-        .dropdown-menu {
-            display: none;
-            position: fixed;
-            top: 80px; /* Adjust based on header height */
-            left: 50%;
-            transform: translateX(-50%) translateY(-10px);
-            width: 90%;
-            max-width: 300px;
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-        .dropdown-menu.active {
-            display: block;
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        .dropdown-backdrop {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 49;
-        }
-        .dropdown-backdrop.active {
-            display: block;
-        }
-        /* Section Header Styles */
-        .section-header {
-            background: linear-gradient(to right, #e0f2fe, #f8fafc);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .toggle-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #3b82f6;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            transition: background 0.2s, box-shadow 0.2s;
-        }
-        .toggle-btn:hover {
-            background: #1d4ed8;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-        .chevron {
-            transition: transform 0.3s ease;
-        }
-        .chevron.rotate {
-            transform: rotate(180deg);
-        }
-        @media (max-width: 768px) {
-            .dropdown-container {
-                display: block;
-            }
-            .timeline-sidebar {
-                display: none;
-            }
-        }
-        @media (min-width: 769px) {
-            .timeline-sidebar.hidden {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-            .dropdown-container {
-                display: none;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trip Itinerary</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/4b9b2b9b2b.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 50;
+    }
+    .modal-content {
+      background: white;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+    }
+    .iphone-view {
+      max-width: 375px;
+      margin: 0 auto;
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    @media (max-width: 640px) {
+      .web-view {
+        display: none;
+      }
+    }
+    .highlight {
+      color: #3b82f6; /* Blue for emphasis */
+    }
+    .status-complete { color: #10b981; }
+    .status-pending { color: #f59e0b; }
+    .status-booked { color: #8b5cf6; }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <!-- Header -->
-    <header class="bg-blue-600 text-white py-4 sticky top-0 z-50">
-        <div class="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <div class="text-center sm:text-left">
-                <h1 class="text-2xl sm:text-3xl font-bold">June 2025 Trip Itinerary</h1>
-                <p class="mt-1 text-sm sm:text-base">San Francisco to Tampa, Tuscany, Split, and Back</p>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Device Selection Modal -->
+  <div id="deviceModal" class="modal flex items-center justify-center">
+    <div class="modal-content bg-white rounded-lg shadow-lg p-6 text-center">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Choose Your View</h2>
+      <div class="flex justify-center space-x-4">
+        <button onclick="selectView('iphone')" class="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg transition">
+          <i class="fas fa-mobile-alt text-blue-500 mr-2"></i> iPhone
+        </button>
+        <button onclick="selectView('web')" class="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg transition">
+          <i class="fas fa-desktop text-purple-500 mr-2"></i> Web
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="iphoneView" class="iphone-view hidden">
+    <div class="bg-white min-h-screen p-4">
+      <h1 class="text-2xl font-bold text-gray-800 mb-4 text-center">Trip Itinerary</h1>
+      <div id="itineraryListIphone"></div>
+    </div>
+  </div>
+  <div id="webView" class="web-view p-6">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Trip Itinerary</h1>
+    <div id="itineraryListWeb" class="space-y-6"></div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal flex items-center justify-center">
+    <div class="modal-content bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Update Itinerary</h2>
+      <form id="editForm" class="space-y-4">
+        <div>
+          <label class="block text-gray-600 font-medium text-sm">Section</label>
+          <input id="editSection" type="text" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" placeholder="e.g., Casa de Koko (3 Nights)">
+        </div>
+        <div>
+          <label class="block text-gray-600 font-medium text-sm">Type</label>
+          <select id="editType" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800">
+            <option value="Flight">Flight</option>
+            <option value="Accommodation">Accommodation</option>
+            <option value="Restaurant">Restaurant</option>
+            <option value="Car Rental">Car Rental</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-gray-600 font-medium text-sm">Date</label>
+          <input id="editDate" type="text" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" placeholder="e.g., Jun 14 - Jun 15, 2025">
+        </div>
+        <div>
+          <label class="block text-gray-600 font-medium text-sm">Details</label>
+          <textarea id="editDetails" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" rows="3" placeholder="e.g., SFO to TPA, United, Cost: $2426.92"></textarea>
+        </div>
+        <div>
+          <label class="block text-gray-600 font-medium text-sm">Status</label>
+          <input id="editStatus" type="text" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" placeholder="e.g., Complete">
+        </div>
+        <div>
+          <label class="block text-gray-600 font-medium text-sm">Link (optional)</label>
+          <input id="editLink" type="text" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 text-gray-800" placeholder="e.g., https://example.com">
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button type="button" onclick="closeEditModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded">Cancel</button>
+          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Itinerary data
+    const itineraryData = [
+      {
+        section: "Casa de Koko (3 Nights)",
+        items: [
+          { type: "Flight", date: "Jun 14 - Jun 15, 2025", details: "SFO to TPA, United, Cost: $2426.92", status: "Complete", link: "" },
+          { type: "Car Rental", date: "Jun 15 - Jun 19, 2025", details: "Enterprise, Cost: $404.33", status: "Complete", link: "" }
+        ]
+      },
+      {
+        section: "Tuscany (7 Nights)",
+        items: [
+          { type: "Flight", date: "Jun 19 - Jun 20, 2025", details: "TPA to FLR, Delta/KLM, Cost: $2900", status: "Complete", link: "" },
+          { type: "Accommodation", date: "Jun 20 - Jun 21, 2025", details: "La Dimora del Mercante, Cost: $371", status: "Complete", link: "https://mimasuites.com/en/la-dimora-del-mercante/" },
+          { type: "Accommodation", date: "Jun 21 - Jun 28, 2025", details: "Il Cortile Pratolino, Cost: $2442", status: "Complete", link: "https://www.tuscanynowandmore.com/villas/il-cortile-pratolino" },
+          { type: "Car Rental", date: "Jun 21 - Jun 28, 2025", details: "Sixt, BMW X1 or Similar, Cost: $1000 (Pay at Counter)", status: "Pending", link: "" }
+        ]
+      },
+      {
+        section: "Split, Croatia (4 Nights)",
+        items: [
+          { type: "Flight", date: "Jun 28, 2025", details: "FLR to SPU, Lufthansa, Cost: $197.9", status: "Complete", link: "" },
+          { type: "Accommodation", date: "Jun 28 - Jun 30, 2025", details: "Procurator 7 Luxury Rooms, Cost: $578.95", status: "Complete", link: "https://procurator-7-luxury-rooms.splithotels.net/en/" },
+          { type: "Restaurant", date: "Jun 29, 2025", details: "Bokeria Kitchen & Wine, Cost: $200 (Pay at Restaurant)", status: "Booked", link: "https://www.tripadvisor.com/Restaurant_Review-g295370-d6903354-Reviews-Bokeria_Kitchen_Wine-Split_Split_Dalmatia_County_Dalmatia.html" },
+          { type: "Accommodation", date: "Jun 30 - Jul 2, 2025", details: "Forkira Luxury Hvar, Cost: $806.63", status: "Complete", link: "https://forkira.com/" },
+          { type: "Accommodation", date: "Jul 2 - Jul 3, 2025", details: "HOTEL, Cost: $200 (TBD)", status: "Pending", link: "" },
+          { type: "Flight", date: "Jul 3, 2025", details: "SPU to TPA, Delta, Cost: $0", status: "Complete", link: "" }
+        ]
+      },
+      {
+        section: "Casa de Koko (3 Nights)",
+        items: [
+          { type: "Flight", date: "Jul 6, 2025", details: "TPA to SFO, United, Cost: TBD", status: "Complete", link: "" }
+        ]
+      }
+    ];
+
+    // Icon mapping
+    const iconMap = {
+      "Flight": '<i class="fas fa-plane text-blue-500 mr-2"></i>',
+      "Accommodation": '<i class="fas fa-hotel text-green-500 mr-2"></i>',
+      "Restaurant": '<i class="fas fa-utensils text-purple-500 mr-2"></i>',
+      "Car Rental": '<i class="fas fa-car text-orange-500 mr-2"></i>'
+    };
+
+    // Render itinerary
+    function renderItinerary() {
+      const iphoneList = document.getElementById('itineraryListIphone');
+      const webList = document.getElementById('itineraryListWeb');
+      iphoneList.innerHTML = '';
+      webList.innerHTML = '';
+
+      itineraryData.forEach((section, sectionIndex) => {
+        // iPhone view
+        const iphoneSection = document.createElement('div');
+        iphoneSection.className = 'mb-6';
+        iphoneSection.innerHTML = `<h2 class="text-xl font-semibold text-gray-800 mb-3">${section.section}</h2>`;
+        section.items.forEach((item, itemIndex) => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = `bg-gray-50 p-3 rounded-lg mb-2 shadow hover:bg-gray-100 cursor-pointer border-l-4 border-${item.type === 'Flight' ? 'blue' : item.type === 'Accommodation' ? 'green' : item.type === 'Restaurant' ? 'purple' : 'orange'}-500`;
+          itemDiv.innerHTML = `
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center">
+                ${iconMap[item.type]}
+                <p class="text-gray-800 text-sm font-medium">${item.type}</p>
+              </div>
+              <p class="text-sm status-${item.status.toLowerCase()}">${item.status}</p>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="dropdown-container">
-                    <button class="dropdown-toggle bg-blue-700 text-white px-3 py-1 rounded-lg flex items-center gap-2" id="dropdown-toggle">
-                        <span>Timeline</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                </div>
-                <button class="sidebar-toggle hidden md:flex bg-blue-700 text-white px-3 py-1 rounded-lg" id="sidebar-toggle">Hide Sidebar</button>
-            </div>
-        </div>
-        <!-- Dropdown Menu -->
-        <div class="dropdown-backdrop" id="dropdown-backdrop"></div>
-        <div class="dropdown-menu" id="dropdown-menu">
-            <div class="p-4">
-                <h2 class="text-lg font-semibold mb-4">Trip Timeline</h2>
-                <div class="relative border-l-4 border-blue-500 pl-4">
-                    <div class="timeline-item mb-4 cursor-pointer" data-section="summary">
-                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium text-sm sm:text-base">Summary</p>
-                    </div>
-                    <div class="timeline-item mb-4 cursor-pointer" data-section="sfo-tpa">
-                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium text-sm sm:text-base">June 7: Depart SFO</p>
-                    </div>
-                    <div class="timeline-item mb-4 cursor-pointer" data-section="casa-de-koko-1">
-                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium text-sm sm:text-base">June 8-12: Casa de Koko</p>
-                    </div>
-                    <div class="timeline-item mb-4 cursor-pointer" data-section="tuscany">
-                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium text-sm sm:text-base">June 14-21: Tuscany</p>
-                    </div>
-                    <div class="timeline-item mb-4 cursor-pointer" data-section="split">
-                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium text-sm sm:text-base">June 22-26: Split & Hvar</p>
-                    </div>
-                    <div class="timeline-item mb-4 cursor-pointer" data-section="casa-de-koko-2">
-                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium text-sm sm:text-base">June 27-29: Casa de Koko</p>
-                    </div>
-                    <div class="timeline-item mb-4 cursor-pointer" data-section="tpa-sfo">
-                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                        <p class="font-medium text-sm sm:text-base">June 29: Return SFO</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <div class="container mx-auto px-4 py-6 flex flex-col md:flex-row">
-        <!-- Timeline Sidebar (Desktop) -->
-        <aside class="timeline-sidebar md:w-1/4 md:pr-8 mb-6 md:mb-0" id="timeline-sidebar">
-            <h2 class="text-lg sm:text-xl font-semibold mb-4">Trip Timeline</h2>
-            <div class="relative border-l-4 border-blue-500 pl-4">
-                <div class="timeline-item mb-4 cursor-pointer" data-section="summary">
-                    <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                    <p class="font-medium">Summary</p>
-                </div>
-                <div class="timeline-item mb-4 cursor-pointer" data-section="sfo-tpa">
-                    <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                    <p class="font-medium">June 7: Depart SFO</p>
-                </div>
-                <div class="timeline-item mb-4 cursor-pointer" data-section="casa-de-koko-1">
-                    <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                    <p class="font-medium">June 8-12: Casa de Koko</p>
-                </div>
-                <div class="timeline-item mb-4 cursor-pointer" data-section="tuscany">
-                    <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                    <p class="font-medium">June 14-21: Tuscany</p>
-                </div>
-                <div class="timeline-item mb-4 cursor-pointer" data-section="split">
-                    <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                    <p class="font-medium">June 22-26: Split & Hvar</p>
-                </div>
-                <div class="timeline-item mb-4 cursor-pointer" data-section="casa-de-koko-2">
-                    <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                    <p class="font-medium">June 27-29: Casa de Koko</p>
-                </div>
-                <div class="timeline-item mb-4 cursor-pointer" data-section="tpa-sfo">
-                    <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
-                    <p class="font-medium">June 29: Return SFO</p>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Sections -->
-        <main class="md:w-3/4">
-            <!-- Summary Section -->
-            <section id="summary" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <div class="section-header flex justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-bold">Trip Summary</h2>
-                    <button class="toggle-btn" data-target="summary-content">
-                        <span>Expand</span>
-                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                </div>
-                <div id="summary-content" class="section-content hidden">
-                    <p><strong>Total Cost:</strong> $11,127.73</p>
-                    <p><strong>Remaining Balance:</strong> $1,332.80</p>
-                    <p class="mt-2 text-sm sm:text-base">This itinerary covers a multi-leg trip from San Francisco to Tampa, Tuscany, Split (including Hvar), and back, with flights, accommodations, and car rentals.</p>
-                </div>
-            </section>
-
-            <!-- SFO to TPA -->
-            <section id="sfo-tpa" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <div class="section-header flex justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-bold">June 7: San Francisco to Tampa</h2>
-                    <button class="toggle-btn" data-target="sfo-tpa-content">
-                        <span>Expand</span>
-                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                </div>
-                <div id="sfo-tpa-content" class="section-content hidden">
-                    <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
-                    <table class="w-full border-collapse text-sm sm:text-base">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-2">Date</th>
-                                <th class="border p-2">Flight #</th>
-                                <th class="border p-2">From-To</th>
-                                <th class="border p-2">Depart</th>
-                                <th class="border p-2">Arrive</th>
-                                <th class="border p-2">Airline</th>
-                                <th class="border p-2">Cost</th>
-                                <th class="border p-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="clickable-row" data-type="flight" data-flight-date="June 7" data-flight-number="TBD" data-flight-from-to="SFO-TPA" data-flight-depart="9:30 PM" data-flight-arrive="5:44 AM (+1)" data-flight-airline="United" data-flight-cost="$2,426.92" data-flight-status="Paid">
-                                <td class="border p-2">June 7</td>
-                                <td class="border p-2">TBD</td>
-                                <td class="border p-2">SFO-TPA</td>
-                                <td class="border p-2">9:30 PM</td>
-                                <td class="border p-2">5:44 AM (+1)</td>
-                                <td class="border p-2">United</td>
-                                <td class="border p-2">$2,426.92</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Casa de Koko (First Stay) -->
-            <section id="casa-de-koko-1" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <div class="section-header flex justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-bold">June 8-12: Casa de Koko, Tampa</h2>
-                    <button class="toggle-btn" data-target="casa-de-koko-1-content">
-                        <span>Expand</span>
-                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                </div>
-                <div id="casa-de-koko-1-content" class="section-content hidden">
-                    <h3 class="text-lg sm:text-xl font-medium mb-2">Accommodation Details</h3>
-                    <table class="w-full border-collapse text-sm sm:text-base">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-2">Dates</th>
-                                <th class="border p-2">Location</th>
-                                <th class="border p-2">Cost</th>
-                                <th class="border p-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="border p-2">June 8-12</td>
-                                <td class="border p-2">Casa de Koko</td>
-                                <td class="border p-2">$737.13</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3 class="text-lg sm:text-xl font-medium mt-4 mb-2">Car Rental</h3>
-                    <p class="text-sm sm:text-base"><strong>Pickup:</strong> June 12, 2:00 PM at TPA</p>
-                </div>
-            </section>
-
-            <!-- Tuscany -->
-            <section id="tuscany" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <div class="section-header flex justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-bold">June 14-21: Tuscany, Italy</h2>
-                    <button class="toggle-btn" data-target="tuscany-content">
-                        <span>Expand</span>
-                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                </div>
-                <div id="tuscany-content" class="section-content hidden">
-                    <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
-                    <table class="w-full border-collapse text-sm sm:text-base">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-2">Date</th>
-                                <th class="border p-2">From-To</th>
-                                <th class="border p-2">Depart</th>
-                                <th class="border p-2">Arrive</th>
-                                <th class="border p-2">Airline</th>
-                                <th class="border p-2">Cost</th>
-                                <th class="border p-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="clickable-row" data-type="flight" data-flight-date="June 12" data-flight-number="" data-flight-from-to="TPA-FLR" data-flight-depart="5:24 PM" data-flight-arrive="7:00 PM (+1)" data-flight-airline="Delta/KLM" data-flight-cost="$2,900.00" data-flight-status="Paid">
-                                <td class="border p-2">June 12</td>
-                                <td class="border p-2">TPA-FLR</td>
-                                <td class="border p-2">5:24 PM</td>
-                                <td class="border p-2">7:00 PM (+1)</td>
-                                <td class="border p-2">Delta/KLM</td>
-                                <td class="border p-2">$2,900.00</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3 class="text-lg sm:text-xl font-medium mt-4 mb-2">Accommodation Details</h3>
-                    <table class="w-full border-collapse text-sm sm:text-base">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-2">Dates</th>
-                                <th class="border p-2">Hotel</th>
-                                <th class="border p-2">Reservation #</th>
-                                <th class="border p-2">Cost</th>
-                                <th class="border p-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="clickable-row" data-type="hotel" data-hotel-name="La Dimora del Mercante" data-hotel-url="https://ladimoradelmercante.com" data-hotel-address="Via della Spada, 11, 50123 Firenze FI, Italy">
-                                <td class="border p-2">June 14-15</td>
-                                <td class="border p-2">
-                                    <a href="https://ladimoradelmercante.com" target="_blank" rel="noopener noreferrer" class="hotel-link">La Dimora del Mercante</a>
-                                </td>
-                                <td class="border p-2">72062828431187</td>
-                                <td class="border p-2">$371.00</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                            <tr class="clickable-row" data-type="hotel" data-hotel-name="Il Cortile Pratolino" data-hotel-url="https://ilcortilepratolino.com" data-hotel-address="Via Pratolino, 5, 50036 Vaglia FI, Italy">
-                                <td class="border p-2">June 15-21</td>
-                                <td class="border p-2">
-                                    <a href="https://ilcortilepratolino.com" target="_blank" rel="noopener noreferrer" class="hotel-link">Il Cortile Pratolino</a>
-                                </td>
-                                <td class="border p-2">Complete</td>
-                                <td class="border p-2">$2,442.00</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3 class="text-lg sm:text-xl font-medium mt-4 mb-2">Car Rental</h3>
-                    <table class="w-full border-collapse text-sm sm:text-base">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-2">Dates</th>
-                                <th class="border p-2">Provider</th>
-                                <th class="border p-2">Vehicle</th>
-                                <th class="border p-2">Reservation #</th>
-                                <th class="border p-2">Cost</th>
-                                <th class="border p-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="clickable-row" data-type="car" data-car-dates="June 14-21" data-car-provider="Sixt" data-car-vehicle="BMW X1 or Similar" data-car-reservation="9721578225" data-car-cost="$1,000.00" data-car-status="Pay at Counter">
-                                <td class="border p-2">June 14-21</td>
-                                <td class="border p-2">Sixt</td>
-                                <td class="border p-2">BMW X1 or Similar</td>
-                                <td class="border p-2">9721578225</td>
-                                <td class="border p-2">$1,000.00</td>
-                                <td class="border p-2">Pay at Counter</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Split & Hvar -->
-            <section id="split" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <div class="section-header flex justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-bold">June 22-26: Split & Hvar, Croatia</h2>
-                    <button class="toggle-btn" data-target="split-content">
-                        <span>Expand</span>
-                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                </div>
-                <div id="split-content" class="section-content hidden">
-                    <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
-                    <table class="w-full border-collapse text-sm sm:text-base">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-2">Date</th>
-                                <th class="border p-2">Flight #</th>
-                                <th class="border p-2">From-To</th>
-                                <th class="border p-2">Depart</th>
-                                <th class="border p-2">Arrive</th>
-                                <th class="border p-2">Airline</th>
-                                <th class="border p-2">Cost</th>
-                                <th class="border p-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="clickable-row" data-type="flight" data-flight-date="June 21" data-flight-number="LH 5689 / LH 5986" data-flight-from-to="FLR-SPU" data-flight-depart="3:40 PM" data-flight-arrive="9:15 PM" data-flight-airline="Lufthansa (Air Dolomiti / Croatia Air)" data-flight-cost="$197.90" data-flight-status="Paid">
-                                <td class="border p-2">June 21</td>
-                                <td class="border p-2">LH 5689 / LH 5986</td>
-                                <td class="border p-2">FLR-SPU</td>
-                                <td class="border p-2">3:40 PM</td>
-                                <td class="border p-2">9:15 PM</td>
-                                <td class="border p-2">Lufthansa (Air Dolomiti / Croatia Air)</td>
-                                <td class="border p-2">$197.90</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                            <tr class="clickable-row" data-type="flight" data-flight-date="June 26" data-flight-number="-" data-flight-from-to="SPU-TPA" data-flight-depart="6:30 AM" data-flight-arrive="2:20 PM" data-flight-airline="Delta" data-flight-cost="$0.00" data-flight-status="Paid">
-                                <td class="border p-2">June 26</td>
-                                <td class="border p-2">-</td>
-                                <td class="border p-2">SPU-TPA</td>
-                                <td class="border p-2">6:30 AM</td>
-                                <td class="border p-2">2:20 PM</td>
-                                <td class="border p-2">Delta</td>
-                                <td class="border p-2">$0.00</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3 class="text-lg sm:text-xl font-medium mt-4 mb-2">Accommodation Details</h3>
-                    <table class="w-full border-collapse text-sm sm:text-base">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-2">Dates</th>
-                                <th class="border p-2">Location</th>
-                                <th class="border p-2">Hotel</th>
-                                <th class="border p-2">Reservation #</th>
-                                <th class="border p-2">Cost</th>
-                                <th class="border p-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="clickable-row" data-type="hotel" data-hotel-name="Procurator 7 Luxury Rooms" data-hotel-url="https://procurator7.com" data-hotel-address="Trg Republike 2, 21000 Split, Croatia">
-                                <td class="border p-2">June 22-24</td>
-                                <td class="border p-2">Split</td>
-                                <td class="border p-2">
-                                    <a href="https://procurator7.com" target="_blank" rel="noopener noreferrer" class="hotel-link">Procurator 7 Luxury Rooms</a>
-                                </td>
-                                <td class="border p-2">-</td>
-                                <td class="border p-2">$578.95</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                            <tr class="clickable-row" data-type="hotel" data-hotel-name="Forkira Luxury Hvar" data-hotel-url="https://forkiraluxuryhvar.com" data-hotel-address="Ulica kralja Zvonimira 12, 21450 Hvar, Croatia">
-                                <td class="border p-2">June 24-26</td>
-                                <td class="border p-2">Hvar</td>
-                                <td class="border p-2">
-                                    <a href="https://forkiraluxuryhvar.com" target="_blank" rel="noopener noreferrer" class="hotel-link">Forkira Luxury Hvar</a>
-                                </td>
-                                <td class="border p-2">72062551969725</td>
-                                <td class="border p-2">$806.63</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                            <tr>
-                                <td class="border p-2">June 26</td>
-                                <td class="border p-2">Split</td>
-                                <td class="border p-2">HOTEL (TBD)</td>
-                                <td class="border p-2">-</td>
-                                <td class="border p-2">$0.00</td>
-                                <td class="border p-2">TBD</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3 class="text-lg sm:text-xl font-medium mt-4 mb-2">Other Bookings</h3>
-                    <table class="w-full border-collapse text-sm sm:text-base">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-2">Type</th>
-                                <th class="border p-2">Details</th>
-                                <th class="border p-2">Date</th>
-                                <th class="border p-2">Time</th>
-                                <th class="border p-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="clickable-row" data-type="other" data-other-type="Restaurant" data-other-details="Bokeria Kitchen & Wine Bar, Split" data-other-date="June 23" data-other-time="5:30 PM - 7:30 PM" data-other-status="Awaiting Confirmation">
-                                <td class="border p-2">Restaurant</td>
-                                <td class="border p-2">Bokeria Kitchen & Wine Bar, Split</td>
-                                <td class="border p-2">June 23</td>
-                                <td class="border p-2">5:30 PM - 7:30 PM</td>
-                                <td class="border p-2">Awaiting Confirmation</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Casa de Koko (Second Stay) -->
-            <section id="casa-de-koko-2" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <div class="section-header flex justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-bold">June 27-29: Casa de Koko, Tampa</h2>
-                    <button class="toggle-btn" data-target="casa-de-koko-2-content">
-                        <span>Expand</span>
-                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                </div>
-                <div id="casa-de-koko-2-content" class="section-content hidden">
-                    <h3 class="text-lg sm:text-xl font-medium mb-2">Accommodation Details</h3>
-                    <table class="w-full border-collapse text-sm sm:text-base">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-2">Dates</th>
-                                <th class="border p-2">Location</th>
-                                <th class="border p-2">Cost</th>
-                                <th class="border p-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="border p-2">June 27-29</td>
-                                <td class="border p-2">Casa de Koko</td>
-                                <td class="border p-2">$0.00</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- TPA to SFO -->
-            <section id="tpa-sfo" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
-                <div class="section-header flex justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-bold">June 29: Tampa to San Francisco</h2>
-                    <button class="toggle-btn" data-target="tpa-sfo-content">
-                        <span>Expand</span>
-                        <svg class="chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                </div>
-                <div id="tpa-sfo-content" class="section-content hidden">
-                    <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
-                    <table class="w-full border-collapse text-sm sm:text-base">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border p-2">Date</th>
-                                <th class="border p-2">From-To</th>
-                                <th class="border p-2">Depart</th>
-                                <th class="border p-2">Arrive</th>
-                                <th class="border p-2">Airline</th>
-                                <th class="border p-2">Cost</th>
-                                <th class="border p-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="clickable-row" data-type="flight" data-flight-date="June 29" data-flight-number="" data-flight-from-to="TPA-SFO" data-flight-depart="7:15 PM" data-flight-arrive="9:35 PM" data-flight-airline="United" data-flight-cost="$0.00" data-flight-status="Paid">
-                                <td class="border p-2">June 29</td>
-                                <td class="border p-2">TPA-SFO</td>
-                                <td class="border p-2">7:15 PM</td>
-                                <td class="border p-2">9:35 PM</td>
-                                <td class="border p-2">United</td>
-                                <td class="border p-2">$0.00</td>
-                                <td class="border p-2 paid-status">Paid</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- Modals -->
-    <!-- Hotel Modal -->
-    <div class="modal" id="hotel-modal">
-        <div class="modal-content">
-            <h2 class="text-xl sm:text-2xl font-semibold mb-4" id="modal-hotel-name"></h2>
-            <p class="text-sm sm:text-base mb-2"><strong>Address:</strong> <span id="modal-hotel-address"></span></p>
-            <p class="text-sm sm:text-base mb-4"><strong>Website:</strong> <a id="modal-hotel-url" href="#" class="hotel-link" target="_blank" rel="noopener noreferrer"></a></p>
-            <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm sm:text-base" id="close-hotel-modal">Close</button>
-        </div>
-    </div>
-    <!-- Flight Modal -->
-    <div class="modal" id="flight-modal">
-        <div class="modal-content">
-            <h2 class="text-xl sm:text-2xl font-semibold mb-4">Flight Details</h2>
-            <p class="text-sm sm:text-base mb-2"><strong>Date:</strong> <span id="modal-flight-date"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Flight #:</strong> <span id="modal-flight-number"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>From-To:</strong> <span id="modal-flight-from-to"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Depart:</strong> <span id="modal-flight-depart"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Arrive:</strong> <span id="modal-flight-arrive"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Airline:</strong> <span id="modal-flight-airline"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Cost:</strong> <span id="modal-flight-cost"></span></p>
-            <p class="text-sm sm:text-base mb-4"><strong>Status:</strong> <span id="modal-flight-status"></span></p>
-            <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm sm:text-base" id="close-flight-modal">Close</button>
-        </div>
-    </div>
-    <!-- Car Rental Modal -->
-    <div class="modal" id="car-modal">
-        <div class="modal-content">
-            <h2 class="text-xl sm:text-2xl font-semibold mb-4">Car Rental Details</h2>
-            <p class="text-sm sm:text-base mb-2"><strong>Dates:</strong> <span id="modal-car-dates"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Provider:</strong> <span id="modal-car-provider"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Vehicle:</strong> <span id="modal-car-vehicle"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Reservation #:</strong> <span id="modal-car-reservation"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Cost:</strong> <span id="modal-car-cost"></span></p>
-            <p class="text-sm sm:text-base mb-4"><strong>Status:</strong> <span id="modal-car-status"></span></p>
-            <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm sm:text-base" id="close-car-modal">Close</button>
-        </div>
-    </div>
-    <!-- Other Booking Modal -->
-    <div class="modal" id="other-modal">
-        <div class="modal-content">
-            <h2 class="text-xl sm:text-2xl font-semibold mb-4">Booking Details</h2>
-            <p class="text-sm sm:text-base mb-2"><strong>Type:</strong> <span id="modal-other-type"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Details:</strong> <span id="modal-other-details"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Date:</strong> <span id="modal-other-date"></span></p>
-            <p class="text-sm sm:text-base mb-2"><strong>Time:</strong> <span id="modal-other-time"></span></p>
-            <p class="text-sm sm:text-base mb-4"><strong>Status:</strong> <span id="modal-other-status"></span></p>
-            <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm sm:text-base" id="close-other-modal">Close</button>
-        </div>
-    </div>
-
-    <!-- JavaScript for Interactivity -->
-    <script>
-        // Toggle section visibility
-        document.querySelectorAll('.toggle-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const targetId = button.getAttribute('data-target');
-                const content = document.getElementById(targetId);
-                const chevron = button.querySelector('.chevron');
-                if (content.classList.contains('visible')) {
-                    content.classList.remove('visible');
-                    content.classList.add('hidden');
-                    button.querySelector('span').textContent = 'Expand';
-                    chevron.classList.remove('rotate');
-                } else {
-                    // Collapse all other sections
-                    document.querySelectorAll('.section-content').forEach(c => {
-                        c.classList.remove('visible');
-                        c.classList.add('hidden');
-                        c.parentElement.querySelector('.toggle-btn span').textContent = 'Expand';
-                        c.parentElement.querySelector('.chevron').classList.remove('rotate');
-                    });
-                    content.classList.remove('hidden');
-                    content.classList.add('visible');
-                    button.querySelector('span').textContent = 'Collapse';
-                    chevron.classList.add('rotate');
-                }
-            });
+            <p class="text-gray-800 font-medium highlight text-sm">${item.date}</p>
+            <p class="text-gray-600 text-sm">${item.details}</p>
+            ${item.link ? `<a href="${item.link}" target="_blank" class="text-blue-500 text-xs underline">View</a>` : ''}
+          `;
+          itemDiv.onclick = () => openEditModal(sectionIndex, itemIndex);
+          iphoneSection.appendChild(itemDiv);
         });
+        iphoneList.appendChild(iphoneSection);
 
-        // Timeline navigation
-        document.querySelectorAll('.timeline-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const sectionId = item.getAttribute('data-section');
-                const section = document.getElementById(sectionId);
-                const content = section.querySelector('.section-content');
-                const toggleBtn = section.querySelector('.toggle-btn');
-                const chevron = toggleBtn.querySelector('.chevron');
+        // Web view
+        const webSection = document.createElement('div');
+        webSection.className = 'bg-white p-6 rounded-lg shadow';
+        webSection.innerHTML = `<h2 class="text-2xl font-semibold text-gray-800 mb-4">${section.section}</h2>`;
+        const table = document.createElement('table');
+        table.className = 'w-full text-left border-collapse';
+        table.innerHTML = `
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="p-3">Type</th>
+              <th class="p-3">Date</th>
+              <th class="p-3">Details</th>
+              <th class="p-3">Status</th>
+              <th class="p-3">Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${section.items.map((item, itemIndex) => `
+              <tr class="border-b hover:bg-gray-50 cursor-pointer" onclick="openEditModal(${sectionIndex}, ${itemIndex})">
+                <td class="p-3">${iconMap[item.type]} ${item.type}</td>
+                <td class="p-3 highlight">${item.date}</td>
+                <td class="p-3">${item.details}</td>
+                <td class="p-3 status-${item.status.toLowerCase()}">${item.status}</td>
+                <td class="p-3">${item.link ? `<a href="${item.link}" target="_blank" class="text-blue-500 underline">View</a>` : '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        `;
+        webSection.appendChild(table);
+        webSection.appendChild(table);
+        webList.appendChild(webSection);
+      });
+    }
 
-                // Collapse all other sections
-                document.querySelectorAll('.section-content').forEach(c => {
-                    c.classList.remove('visible');
-                    c.classList.add('hidden');
-                    c.parentElement.querySelector('.toggle-btn span').textContent = 'Expand';
-                    c.parentElement.querySelector('.chevron').classList.remove('rotate');
-                });
+    // Device selection
+    function selectView(view) {
+      document.getElementById('deviceModal').style.display = 'none';
+      if (view === 'iphone') {
+        document.getElementById('iphoneView').classList.remove('hidden');
+        document.getElementById('webView').classList.add('hidden');
+      } else {
+        document.getElementById('webView').classList.remove('hidden');
+        document.getElementById('iphoneView').classList.add('hidden');
+      }
+      renderItinerary();
+    }
 
-                // Expand selected section
-                content.classList.remove('hidden');
-                content.classList.add('visible');
-                toggleBtn.querySelector('span').textContent = 'Collapse';
-                chevron.classList.add('rotate');
+    // Edit modal
+    let currentSectionIndex, currentItemIndex;
+    function openEditModal(sectionIndex, itemIndex) {
+      currentSectionIndex = sectionIndex;
+      currentItemIndex = itemIndex;
+      const item = itineraryData[sectionIndex].items[itemIndex];
+      document.getElementById('editSection').value = itineraryData[sectionIndex].section;
+      document.getElementById('editType').value = item.type;
+      document.getElementById('editDate').value = item.date;
+      document.getElementById('editDetails').value = item.details;
+      document.getElementById('editStatus').value = item.status;
+      document.getElementById('editLink').value = item.link || '';
+      document.getElementById('editModal').style.display = 'flex';
+    }
 
-                section.scrollIntoView({ behavior: 'smooth' });
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
 
-                // Close dropdown
-                const dropdownMenu = document.getElementById('dropdown-menu');
-                const dropdownBackdrop = document.getElementById('dropdown-backdrop');
-                dropdownMenu.classList.remove('active');
-                dropdownBackdrop.classList.remove('active');
-            });
-        });
+    document.getElementById('editForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const section = document.getElementById('editSection').value;
+      const item = {
+        type: document.getElementById('editType').value,
+        date: document.getElementById('editDate').value,
+        details: document.getElementById('editDetails').value,
+        status: document.getElementById('editStatus').value,
+        link: document.getElementById('editLink').value
+      };
+      itineraryData[currentSectionIndex].section = section;
+      itineraryData[currentSectionIndex].items[currentItemIndex] = item;
+      closeEditModal();
+      renderItinerary();
+    });
 
-        // Dropdown toggle
-        const dropdownToggle = document.getElementById('dropdown-toggle');
-        const dropdownMenu = document.getElementById('dropdown-menu');
-        const dropdownBackdrop = document.getElementById('dropdown-backdrop');
-        dropdownToggle.addEventListener('click', () => {
-            const isActive = dropdownMenu.classList.contains('active');
-            dropdownMenu.classList.toggle('active');
-            dropdownBackdrop.classList.toggle('active');
-        });
-
-        // Close dropdown when clicking backdrop
-        dropdownBackdrop.addEventListener('click', () => {
-            dropdownMenu.classList.remove('active');
-            dropdownBackdrop.classList.remove('active');
-        });
-
-        // Sidebar toggle (desktop)
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        const timelineSidebar = document.getElementById('timeline-sidebar');
-        sidebarToggle.addEventListener('click', () => {
-            timelineSidebar.classList.toggle('hidden');
-            sidebarToggle.textContent = timelineSidebar.classList.contains('hidden') ? 'Show Sidebar' : 'Hide Sidebar';
-        });
-
-        // Modal handling
-        const modals = {
-            hotel: {
-                modal: document.getElementById('hotel-modal'),
-                fields: {
-                    name: document.getElementById('modal-hotel-name'),
-                    address: document.getElementById('modal-hotel-address'),
-                    url: document.getElementById('modal-hotel-url')
-                },
-                close: document.getElementById('close-hotel-modal')
-            },
-            flight: {
-                modal: document.getElementById('flight-modal'),
-                fields: {
-                    date: document.getElementById('modal-flight-date'),
-                    number: document.getElementById('modal-flight-number'),
-                    fromTo: document.getElementById('modal-flight-from-to'),
-                    depart: document.getElementById('modal-flight-depart'),
-                    arrive: document.getElementById('modal-flight-arrive'),
-                    airline: document.getElementById('modal-flight-airline'),
-                    cost: document.getElementById('modal-flight-cost'),
-                    status: document.getElementById('modal-flight-status')
-                },
-                close: document.getElementById('close-flight-modal')
-            },
-            car: {
-                modal: document.getElementById('car-modal'),
-                fields: {
-                    dates: document.getElementById('modal-car-dates'),
-                    provider: document.getElementById('modal-car-provider'),
-                    vehicle: document.getElementById('modal-car-vehicle'),
-                    reservation: document.getElementById('modal-car-reservation'),
-                    cost: document.getElementById('modal-car-cost'),
-                    status: document.getElementById('modal-car-status')
-                },
-                close: document.getElementById('close-car-modal')
-            },
-            other: {
-                modal: document.getElementById('other-modal'),
-                fields: {
-                    type: document.getElementById('modal-other-type'),
-                    details: document.getElementById('modal-other-details'),
-                    date: document.getElementById('modal-other-date'),
-                    time: document.getElementById('modal-other-time'),
-                    status: document.getElementById('modal-other-status')
-                },
-                close: document.getElementById('close-other-modal')
-            }
-        };
-
-        // Close all modals
-        function closeAllModals() {
-            Object.values(modals).forEach(m => {
-                m.modal.style.display = 'none';
-            });
-        }
-
-        // Row click handling
-        document.querySelectorAll('.clickable-row').forEach(row => {
-            row.addEventListener('click', (e) => {
-                if (e.target.classList.contains('hotel-link')) {
-                    e.stopPropagation();
-                    return;
-                }
-
-                const type = row.getAttribute('data-type');
-                const modal = modals[type];
-
-                if (!modal) return;
-
-                closeAllModals();
-
-                if (type === 'hotel') {
-                    const name = row.getAttribute('data-hotel-name');
-                    const url = row.getAttribute('data-hotel-url');
-                    const address = row.getAttribute('data-hotel-address');
-                    modal.fields.name.textContent = name;
-                    modal.fields.address.textContent = address;
-                    modal.fields.url.href = url;
-                    modal.fields.url.textContent = url;
-                } else if (type === 'flight') {
-                    modal.fields.date.textContent = row.getAttribute('data-flight-date');
-                    modal.fields.number.textContent = row.getAttribute('data-flight-number') || 'N/A';
-                    modal.fields.fromTo.textContent = row.getAttribute('data-flight-from-to');
-                    modal.fields.depart.textContent = row.getAttribute('data-flight-depart');
-                    modal.fields.arrive.textContent = row.getAttribute('data-flight-arrive');
-                    modal.fields.airline.textContent = row.getAttribute('data-flight-airline');
-                    modal.fields.cost.textContent = row.getAttribute('data-flight-cost');
-                    modal.fields.status.textContent = row.getAttribute('data-flight-status');
-                } else if (type === 'car') {
-                    modal.fields.dates.textContent = row.getAttribute('data-car-dates');
-                    modal.fields.provider.textContent = row.getAttribute('data-car-provider');
-                    modal.fields.vehicle.textContent = row.getAttribute('data-car-vehicle');
-                    modal.fields.reservation.textContent = row.getAttribute('data-car-reservation');
-                    modal.fields.cost.textContent = row.getAttribute('data-car-cost');
-                    modal.fields.status.textContent = row.getAttribute('data-car-status');
-                } else if (type === 'other') {
-                    modal.fields.type.textContent = row.getAttribute('data-other-type');
-                    modal.fields.details.textContent = row.getAttribute('data-other-details');
-                    modal.fields.date.textContent = row.getAttribute('data-other-date');
-                    modal.fields.time.textContent = row.getAttribute('data-other-time');
-                    modal.fields.status.textContent = row.getAttribute('data-other-status');
-                }
-
-                modal.modal.style.display = 'flex';
-            });
-        });
-
-        // Close modal handlers
-        Object.values(modals).forEach(modal => {
-            modal.close.addEventListener('click', closeAllModals);
-            modal.modal.addEventListener('click', (e) => {
-                if (e.target === modal.modal) closeAllModals();
-            });
-        });
-
-        // Close modals and dropdown with Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeAllModals();
-                dropdownMenu.classList.remove('active');
-                dropdownBackdrop.classList.remove('active');
-            }
-        });
-    </script>
+    // Initialize
+    document.getElementById('deviceModal').style.display = 'flex';
+  </script>
+</body>
+</html>
