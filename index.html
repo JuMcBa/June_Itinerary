@@ -43,38 +43,6 @@
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
         }
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-        }
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: white;
-            margin: 2px 0;
-            transition: all 0.3s;
-        }
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-            .timeline-sidebar {
-                display: none;
-            }
-            .timeline-sidebar.active {
-                display: block;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 75%;
-                height: 100%;
-                background: white;
-                z-index: 50;
-                padding: 1rem;
-                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-            }
-        }
         .modal {
             display: none;
             position: fixed;
@@ -110,13 +78,52 @@
             color: #1d4ed8;
             text-decoration: underline;
         }
-        /* Clickable row styles */
         .clickable-row {
             cursor: pointer;
             transition: background-color 0.2s;
         }
         .clickable-row:hover {
             background-color: #f3f4f6;
+        }
+        /* Dropdown and Sidebar Styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 40;
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .dropdown-menu.active {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .timeline-sidebar {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        @media (max-width: 768px) {
+            .timeline-sidebar {
+                display: none;
+            }
+            .dropdown-toggle {
+                display: flex;
+            }
+        }
+        @media (min-width: 769px) {
+            .timeline-sidebar.hidden {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            .dropdown-toggle {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -128,18 +135,54 @@
                 <h1 class="text-2xl sm:text-3xl font-bold">June 2025 Trip Itinerary</h1>
                 <p class="mt-1 text-sm sm:text-base">San Francisco to Tampa, Tuscany, Split, and Back</p>
             </div>
-            <div class="hamburger md:hidden" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
+            <button class="dropdown-toggle md:hidden bg-blue-700 text-white px-3 py-1 rounded-lg flex items-center gap-2" id="dropdown-toggle">
+                <span>Timeline</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <button class="dropdown-toggle hidden md:flex bg-blue-700 text-white px-3 py-1 rounded-lg" id="sidebar-toggle">Toggle Sidebar</button>
+        </div>
+        <!-- Dropdown Menu -->
+        <div class="dropdown-menu md:hidden" id="dropdown-menu">
+            <div class="p-4">
+                <h2 class="text-lg font-semibold mb-4">Trip Timeline</h2>
+                <div class="relative border-l-4 border-blue-500 pl-4">
+                    <div class="timeline-item mb-4 cursor-pointer" data-section="summary">
+                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
+                        <p class="font-medium">Summary</p>
+                    </div>
+                    <div class="timeline-item mb-4 cursor-pointer" data-section="sfo-tpa">
+                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
+                        <p class="font-medium">June 7: Depart SFO</p>
+                    </div>
+                    <div class="timeline-item mb-4 cursor-pointer" data-section="casa-de-koko-1">
+                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
+                        <p class="font-medium">June 8-12: Casa de Koko</p>
+                    </div>
+                    <div class="timeline-item mb-4 cursor-pointer" data-section="tuscany">
+                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
+                        <p class="font-medium">June 14-21: Tuscany</p>
+                    </div>
+                    <div class="timeline-item mb-4 cursor-pointer" data-section="split">
+                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
+                        <p class="font-medium">June 22-26: Split & Hvar</p>
+                    </div>
+                    <div class="timeline-item mb-4 cursor-pointer" data-section="casa-de-koko-2">
+                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
+                        <p class="font-medium">June 27-29: Casa de Koko</p>
+                    </div>
+                    <div class="timeline-item mb-4 cursor-pointer" data-section="tpa-sfo">
+                        <div class="timeline-dot absolute w-4 h-4 bg-blue-500 rounded-full -left-6 mt-1"></div>
+                        <p class="font-medium">June 29: Return SFO</p>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-6 flex flex-col md:flex-row">
-        <!-- Timeline Sidebar -->
-        <aside class="timeline-sidebar md:w-1/4 md:pr-8 mb-6 md:mb-0" id="timeline">
+        <!-- Timeline Sidebar (Desktop) -->
+        <aside class="timeline-sidebar md:w-1/4 md:pr-8 mb-6 md:mb-0" id="timeline-sidebar">
             <h2 class="text-lg sm:text-xl font-semibold mb-4">Trip Timeline</h2>
             <div class="relative border-l-4 border-blue-500 pl-4">
                 <div class="timeline-item mb-4 cursor-pointer" data-section="summary">
@@ -179,9 +222,9 @@
             <section id="summary" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
                 <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
                     Trip Summary
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="summary-content">Toggle</button>
+                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="summary-content">Expand</button>
                 </h2>
-                <div id="summary-content" class="section-content visible">
+                <div id="summary-content" class="section-content hidden">
                     <p><strong>Total Cost:</strong> $11,127.73</p>
                     <p><strong>Remaining Balance:</strong> $1,332.80</p>
                     <p class="mt-2 text-sm sm:text-base">This itinerary covers a multi-leg trip from San Francisco to Tampa, Tuscany, Split (including Hvar), and back, with flights, accommodations, and car rentals.</p>
@@ -192,9 +235,9 @@
             <section id="sfo-tpa" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
                 <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
                     June 7: San Francisco to Tampa
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="sfo-tpa-content">Toggle</button>
+                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="sfo-tpa-content">Expand</button>
                 </h2>
-                <div id="sfo-tpa-content" class="section-content visible">
+                <div id="sfo-tpa-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
                         <thead>
@@ -229,9 +272,9 @@
             <section id="casa-de-koko-1" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
                 <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
                     June 8-12: Casa de Koko, Tampa
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="casa-de-koko-1-content">Toggle</button>
+                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="casa-de-koko-1-content">Expand</button>
                 </h2>
-                <div id="casa-de-koko-1-content" class="section-content visible">
+                <div id="casa-de-koko-1-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Accommodation Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
                         <thead>
@@ -260,9 +303,9 @@
             <section id="tuscany" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
                 <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
                     June 14-21: Tuscany, Italy
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="tuscany-content">Toggle</button>
+                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="tuscany-content">Expand</button>
                 </h2>
-                <div id="tuscany-content" class="section-content visible">
+                <div id="tuscany-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
                         <thead>
@@ -350,9 +393,9 @@
             <section id="split" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
                 <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
                     June 22-26: Split & Hvar, Croatia
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="split-content">Toggle</button>
+                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="split-content">Expand</button>
                 </h2>
-                <div id="split-content" class="section-content visible">
+                <div id="split-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
                         <thead>
@@ -461,9 +504,9 @@
             <section id="casa-de-koko-2" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
                 <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
                     June 27-29: Casa de Koko, Tampa
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="casa-de-koko-2-content">Toggle</button>
+                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="casa-de-koko-2-content">Expand</button>
                 </h2>
-                <div id="casa-de-koko-2-content" class="section-content visible">
+                <div id="casa-de-koko-2-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Accommodation Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
                         <thead>
@@ -490,9 +533,9 @@
             <section id="tpa-sfo" class="mb-6 bg-white p-4 sm:p-6 rounded-lg shadow">
                 <h2 class="text-xl sm:text-2xl font-semibold mb-4 flex justify-between items-center">
                     June 29: Tampa to San Francisco
-                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="tpa-sfo-content">Toggle</button>
+                    <button class="toggle-btn text-blue-500 hover:text-blue-700 text-sm sm:text-base px-3 py-1" data-target="tpa-sfo-content">Expand</button>
                 </h2>
-                <div id="tpa-sfo-content" class="section-content visible">
+                <div id="tpa-sfo-content" class="section-content hidden">
                     <h3 class="text-lg sm:text-xl font-medium mb-2">Flight Details</h3>
                     <table class="w-full border-collapse text-sm sm:text-base">
                         <thead>
@@ -586,6 +629,12 @@
                     content.classList.add('hidden');
                     button.textContent = 'Expand';
                 } else {
+                    // Collapse all other sections
+                    document.querySelectorAll('.section-content').forEach(c => {
+                        c.classList.remove('visible');
+                        c.classList.add('hidden');
+                        c.parentElement.querySelector('.toggle-btn').textContent = 'Expand';
+                    });
                     content.classList.remove('hidden');
                     content.classList.add('visible');
                     button.textContent = 'Collapse';
@@ -598,19 +647,44 @@
             item.addEventListener('click', () => {
                 const sectionId = item.getAttribute('data-section');
                 const section = document.getElementById(sectionId);
+                const content = section.querySelector('.section-content');
+                const toggleBtn = section.querySelector('.toggle-btn');
+
+                // Collapse all other sections
+                document.querySelectorAll('.section-content').forEach(c => {
+                    c.classList.remove('visible');
+                    c.classList.add('hidden');
+                    c.parentElement.querySelector('.toggle-btn').textContent = 'Expand';
+                });
+
+                // Expand selected section
+                content.classList.remove('hidden');
+                content.classList.add('visible');
+                toggleBtn.textContent = 'Collapse';
+
                 section.scrollIntoView({ behavior: 'smooth' });
-                const timeline = document.getElementById('timeline');
-                if (timeline.classList.contains('active')) {
-                    timeline.classList.remove('active');
+
+                // Close dropdown on mobile
+                const dropdownMenu = document.getElementById('dropdown-menu');
+                if (dropdownMenu.classList.contains('active')) {
+                    dropdownMenu.classList.remove('active');
                 }
             });
         });
 
-        // Hamburger menu toggle
-        const hamburger = document.getElementById('hamburger');
-        const timeline = document.getElementById('timeline');
-        hamburger.addEventListener('click', () => {
-            timeline.classList.toggle('active');
+        // Dropdown toggle
+        const dropdownToggle = document.getElementById('dropdown-toggle');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        dropdownToggle.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('active');
+        });
+
+        // Sidebar toggle (desktop)
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const timelineSidebar = document.getElementById('timeline-sidebar');
+        sidebarToggle.addEventListener('click', () => {
+            timelineSidebar.classList.toggle('hidden');
+            sidebarToggle.textContent = timelineSidebar.classList.contains('hidden') ? 'Show Sidebar' : 'Hide Sidebar';
         });
 
         // Modal handling
@@ -674,7 +748,10 @@
         document.querySelectorAll('.clickable-row').forEach(row => {
             row.addEventListener('click', (e) => {
                 // Prevent opening modal if clicking the hotel link
-                if (e.target.classList.contains('hotel-link')) return;
+                if (e.target.classList.contains('hotel-link')) {
+                    e.stopPropagation();
+                    return;
+                }
 
                 const type = row.getAttribute('data-type');
                 const modal = modals[type];
@@ -729,6 +806,9 @@
 
         // Close modals with Escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeAllModals();
+            if (e.key === 'Escape') {
+                closeAllModals();
+                dropdownMenu.classList.remove('active');
+            }
         });
     </script>
