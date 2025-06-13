@@ -1,1 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>June 2025 Trip Itinerary</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .calendar-day { width: 14.28%; text-align: center; padding: 1rem; min-height: 80px; }
+    .calendar-day.active { background-color: #e6f3fa; border-radius: 8px; cursor: pointer; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+    .modal-content { background: white; margin: 10% auto; padding: 20px; width: 80%; max-width: 600px; border-radius: 8px; }
+    .accordion-header { cursor: pointer; padding: 1rem; background: #f1f5f9; border-radius: 4px; }
+    .accordion-content { display: none; padding: 1rem; }
+    .accordion-content.active { display: block; }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+  <!-- Header -->
+  <div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">June 2025 Trip Itinerary</h1>
+    <!-- Tabs -->
+    <div class="flex border-b mb-4">
+      <button class="tab-button px-4 py-2 text-purple-600 border-b-2 border-transparent hover:border-purple-600 focus:outline-none" onclick="openTab('calendar')">Trip Calendar</button>
+      <button class="tab-button px-4 py-2 text-purple-600 border-b-2 border-transparent hover:border-purple-600 focus:outline-none" onclick="openTab('itinerary')">Itinerary Details</button>
+      <button class="tab-button px-4 py-2 text-purple-600 border-b-2 border-transparent hover:border-purple-600 focus:outline-none" onclick="openTab('costs')">Cost Summary</button>
+    </div>
 
+    <!-- Tab Contents -->
+    <div id="calendar" class="tab-content card bg-white rounded-lg shadow p-4">
+      <h2 class="text-xl font-bold mb-4">Trip Calendar</h2>
+      <div class="flex flex-wrap border-b mb-2">
+        <div class="w-1/7 text-center font-bold p-2">Sun</div>
+        <div class="w-1/7 text-center font-bold p-2">Mon</div>
+        <div class="w-1/7 text-center font-bold p-2">Tue</div>
+        <div class="w-1/7 text-center font-bold p-2">Wed</div>
+        <div class="w-1/7 text-center font-bold p-2">Thu</div>
+        <div class="w-1/7 text-center font-bold p-2">Fri</div>
+        <div class="w-1/7 text-center font-bold p-2">Sat</div>
+      </div>
+      <div id="calendar-days" class="flex flex-wrap"></div>
+    </div>
+
+    <div id="itinerary" class="tab-content card bg-white rounded-lg shadow p-4" style="display: none;">
+      <h2 class="text-xl font-bold mb-4">Itinerary Details</h2>
+      <div id="itinerary-list" class="space-y-4"></div>
+    </div>
+
+    <div id="costs" class="tab-content card bg-white rounded-lg shadow p-4" style="display: none;">
+      <h2 class="text-xl font-bold mb-4">Cost Summary</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="p-2">Item</th>
+              <th class="p-2">Details</th>
+              <th class="p-2">Cost</th>
+              <th class="p-2">Status</th>
+              <th class="p-2">Remaining</th>
+            </tr>
+          </thead>
+          <tbody id="cost-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Calendar Details -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
+      <p id="modal-details"></p>
+      <button onclick="closeModal()" class="mt-4 bg-purple-600 text-white px-4 py-2 rounded">Close</button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    const itineraryData = {
+      calendar: [
+        { day: 7, activities: ["<i class='fas fa-plane'></i> Depart SFO (Booked)"], details: "Flight SFO-TPA, United, Conf #: G2XZ4Z, J,E,L,C" },
+        { day: 8, activities: ["<i class='fas fa-bed'></i> Casa de Koko"], details: "Stay at Casa de Koko" },
+        { day: 9, activities: ["<i class='fas fa-bed'></i> Casa de Koko"], details: "Stay at Casa de Koko" },
+        { day: 10, activities: ["<i class='fas fa-bed'></i> Casa de Koko"], details: "Stay at Casa de Koko" },
+        { day: 11, activities: ["<i class='fas fa-bed'></i> Casa de Koko"], details: "Stay at Casa de Koko" },
+        { day: 12, activities: ["<i class='fas fa-plane'></i> Depart TPA", "<i class='fas fa-car'></i> Pickup Rental Car 2PM"], details: "Flight TPA-FLR, Delta/KLM, Justin & Elona; Sixt Rental, BMW X1" },
+        { day: 13, activities: ["<i class='fas fa-map-marker-alt'></i> Florence"], details: "Arrive in Florence" },
+        { day: 14, activities: ["<i class='fas fa-map-marker-alt'></i> Florence - Tuscany"], details: "Stay at La Dimora del Mercante" },
+        { day: 15, activities: ["<i class='fas fa-map-marker-alt'></i> Tuscany"], details: "Stay at Il Cortile Pratolino" },
+        { day: 16, activities: ["<i class='fas fa-map-marker-alt'></i> Tuscany", "J & E Day"], details: "Stay at Il Cortile Pratolino" },
+        { day: 17, activities: ["<i class='fas fa-map-marker-alt'></i> Tuscany"], details: "Stay at Il Cortile Pratolino" },
+        { day: 18, activities: ["<i class='fas fa-map-marker-alt'></i> Tuscany"], details: "Stay at Il Cortile Pratolino" },
+        { day: 19, activities: ["<i class='fas fa-map-marker-alt'></i> Tuscany"], details: "Stay at Il Cortile Pratolino" },
+        { day: 20, activities: ["<i class='fas fa-map-marker-alt'></i> Tuscany"], details: "Stay at Il Cortile Pratolino" },
+        { day: 21, activities: ["<i class='fas fa-map-marker-alt'></i> Tuscany - Florence - Split", "<i class='fas fa-plane'></i> 3:40 PM Flight"], details: "Flight FLR-SPU, Lufthansa, Justin & Elona" },
+        { day: 22, activities: ["<i class='fas fa-bed'></i> Split"], details: "Stay at Procurator 7 Luxury Rooms" },
+        { day: 23, activities: ["<i class='fas fa-ferry'></i> Split - Hvar"], details: "Stay at Forkira Luxury Hvar" },
+        { day: 24, activities: ["<i class='fas fa-map-marker-alt'></i> Hvar"], details: "Stay at Forkira Luxury Hvar" },
+        { day: 25, activities: ["<i class='fas fa-ferry'></i> Hvar - Split"], details: "Return to Split, HOTEL TBD" },
+        { day: 26, activities: ["<i class='fas fa-plane'></i> Split - TPA"], details: "Flight SPU-TPA, Delta, Justin & Elona" },
+        { day: 27, activities: ["<i class='fas fa-bed'></i> Casa de Koko"], details: "Stay at Casa de Koko" },
+        { day: 28, activities: ["<i class='fas fa-bed'></i> Casa de Koko"], details: "Stay at Casa de Koko" },
+        { day: 29, activities: ["<i class='fas fa-plane'></i> TPA - SFO (Booked)"], details: "Flight TPA-SFO, United, J,E,L,C" },
+      ],
+      itinerary: [
+        {
+          dates: "June 7 - June 8",
+          category: "Flights",
+          details: "<i class='fas fa-plane'></i> SFO to TPA, United, Conf #: G2XZ4Z, Depart 9:30 PM, Arrive 5:44 AM (+1), Persons: J,E,L,C, Cost: $2426.92 (Paid)"
+        },
+        {
+          dates: "June 8 - June 11",
+          category: "Accommodations",
+          details: "<i class='fas fa-bed'></i> Casa de Koko, 3 nights, Cost: $332.80 (Paid)"
+        },
+        {
+          dates: "June 12 - June 13",
+          category: "Flights",
+          details: "<i class='fas fa-plane'></i> TPA to Florence, Delta/KLM, Depart 5:45 PM, Arrive 7:00 PM (+1), Persons: Justin & Elona, Cost: $2900 (Paid); <i class='fas fa-car'></i> Car Rental: Sixt, BMW X1, Pickup 2PM, Cost: $1000 (Pay at Counter)"
+        },
+        {
+          dates: "June 13 - June 21",
+          category: "Accommodations",
+          details: "<i class='fas fa-bed'></i> La Dimora del Mercante (1 night, $371, Paid), Il Cortile Pratolino (7 nights, $2442, Paid)"
+        },
+        {
+          dates: "June 21 - June 26",
+          category: "Flights & Accommodations",
+          details: "<i class='fas fa-plane'></i> Flight FLR-SPU, Lufthansa, Depart 3:40 PM, Arrive 9:05 PM, Cost: $197.90 (Paid); <i class='fas fa-bed'></i> Procurator 7 Luxury Rooms (2 nights, $578.95, Paid), Forkira Luxury Hvar (2 nights, $806.63, Paid), HOTEL TBD (1 night); <i class='fas fa-utensils'></i> Reservation: Bokeria Kitchen & Wine Bar (June 23, Awaiting Confirmation)"
+        },
+        {
+          dates: "June 26 - June 29",
+          category: "Flights & Accommodations",
+          details: "<i class='fas fa-plane'></i> Split to TPA, Delta, Depart 6:30 AM, Arrive 2:20 PM, Cost: $0 (Paid); <i class='fas fa-bed'></i> Stay at Casa de Koko (3 nights)"
+        },
+        {
+          dates: "June 29",
+          category: "Flights",
+          details: "<i class='fas fa-plane'></i> TPA to SFO, United, Depart 7:15 PM, Arrive 9:35 PM, Persons: J,E,L,C, Cost: TBD (Paid)"
+        }
+      ],
+      costs: [
+        { item: "Flight SFO-TPA", details: "United, Conf #: G2XZ4Z", cost: 2426.92, status: "Paid", remaining: 0 },
+        { item: "Casa de Koko (June 8-11)", details: "3 nights", cost: 332.80, status: "Paid", remaining: 0 },
+        { item: "Flight TPA-FLR", details: "Delta/KLM", cost: 2900, status: "Paid", remaining: 0 },
+        { item: "Car Rental", details: "Sixt, BMW X1", cost: 1000, status: "Pay at Counter", remaining: 1000 },
+        { item: "La Dimora del Mercante", details: "1 night", cost: 371, status: "Paid", remaining: 0 },
+        { item: "Il Cortile Pratolino", details: "7 nights", cost: 2442, status: "Paid", remaining: 0 },
+        { item: "Flight FLR-SPU", details: "Lufthansa", cost: 197.90, status: "Paid", remaining: 0 },
+        { item: "Procurator 7 Luxury Rooms", details: "2 nights", cost: 578.95, status: "Paid", remaining: 0 },
+        { item: "Forkira Luxury Hvar", details: "2 nights", cost: 806.63, status: "Paid", remaining: 0 },
+        { item: "Flight SPU-TPA", details: "Delta", cost: 0, status: "Paid", remaining: 0 },
+        { item: "Flight TPA-SFO", details: "United", cost: 0, status: "Paid", remaining: 0 },
+        { item: "Total", details: "", cost: 11127.73, status: "", remaining: 1332.80 }
+      ]
+    };
+
+    // Generate Calendar
+    const calendarDays = document.getElementById('calendar-days');
+    for (let i = 1; i <= 30; i++) {
+      const dayData = itineraryData.calendar.find(d => d.day === i);
+      const div = document.createElement('div');
+      div.className = `calendar-day ${dayData ? 'active' : ''}`;
+      div.innerHTML = `<div>${i}</div>${dayData ? `<div class="text-sm">${dayData.activities.join('<br>')}</div>` : ''}`;
+      if (dayData) {
+        div.onclick = () => openModal(i, dayData.activities.join(', '), dayData.details);
+      }
+      calendarDays.appendChild(div);
+    }
+
+    // Generate Itinerary
+    const itineraryList = document.getElementById('itinerary-list');
+    itineraryData.itinerary.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'bg-white rounded-lg shadow';
+      div.innerHTML = `
+        <div class="accordion-header flex justify-between items-center">
+          <span>${item.dates}: ${item.category}</span>
+          <span class="text-purple-600">Details</span>
+        </div>
+        <div class="accordion-content">${item.details}</div>
+      `;
+      itineraryList.appendChild(div);
+    });
+
+    // Generate Cost Table
+    const costTable = document.getElementById('cost-table');
+    itineraryData.costs.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="p-2">${item.item}</td>
+        <td class="p-2">${item.details}</td>
+        <td class="p-2">$${item.cost.toFixed(2)}</td>
+        <td class="p-2">${item.status}</td>
+        <td class="p-2">$${item.remaining.toFixed(2)}</td>
+      `;
+      costTable.appendChild(row);
+    });
+
+    // Tab Functionality
+    function openTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('border-purple-600'));
+      document.getElementById(tabName).classList.add('active');
+      document.querySelector(`[onclick="openTab('${tabName}')"]`).classList.add('border-purple-600');
+    }
+    document.querySelector('.tab-button').click(); // Activate first tab by default
+
+    // Modal Functions
+    function openModal(day, activities, details) {
+      document.getElementById('modal-title').innerHTML = `June ${day}, 2025`;
+      document.getElementById('modal-details').innerHTML = `${activities}<br><br>${details}`;
+      document.getElementById('modal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    // Accordion Functionality
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        content.classList.toggle('active');
+      });
+    });
+  </script>
+</body>
+</html>
